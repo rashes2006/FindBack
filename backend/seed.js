@@ -297,11 +297,19 @@ const seedData = async () => {
     console.log('  Code: 749216 (for AirPods Pro waiting at Security Desk)');
     console.log('======================================================\n');
 
-    process.exit(0);
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('Seed error:', error);
-    process.exit(1);
+    if (require.main === module) {
+      process.exit(1);
+    }
   }
 };
 
-seedData();
+if (require.main === module) {
+  seedData();
+}
+
+module.exports = { seedData };

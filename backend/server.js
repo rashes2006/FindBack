@@ -8,8 +8,21 @@ const errorHandler = require('./middleware/errorHandler');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and auto-seed demo data if empty
+const Item = require('./models/Item');
+const { seedData } = require('./seed');
+
+connectDB().then(async () => {
+  try {
+    const count = await Item.countDocuments();
+    if (count === 0) {
+      console.log('Database empty. Automatically seeding demo campus items & users...');
+      await seedData();
+    }
+  } catch (err) {
+    console.warn('Auto-seed check failed:', err.message);
+  }
+});
 
 const app = express();
 

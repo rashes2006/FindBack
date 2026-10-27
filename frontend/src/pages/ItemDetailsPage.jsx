@@ -13,11 +13,14 @@ import {
   KeyRound,
   Sparkles,
   ExternalLink,
-  AlertCircle
+  AlertCircle,
+  Heart,
+  CreditCard
 } from 'lucide-react';
 import { StatusBadge } from '../components/StatusBadge';
 import { ClaimModal } from '../components/ClaimModal';
 import { HandoverOtpModal } from '../components/HandoverOtpModal';
+import { PaymentModal } from '../components/PaymentModal';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
@@ -34,6 +37,8 @@ export const ItemDetailsPage = ({ itemId, onBack, onOpenAuth }) => {
   // Modals
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [showHandoverModal, setShowHandoverModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [itemPayments, setItemPayments] = useState([]);
 
   // Review states
   const [reviewNote, setReviewNote] = useState('');
@@ -79,6 +84,16 @@ export const ItemDetailsPage = ({ itemId, onBack, onOpenAuth }) => {
           } catch (myClaimErr) {
             console.warn(myClaimErr.message);
           }
+        }
+
+        // Fetch captured payments / rewards for this item
+        try {
+          const itemPayRes = await apiClient(`/payments/item/${itemId}`);
+          if (itemPayRes.success) {
+            setItemPayments(itemPayRes.payments || []);
+          }
+        } catch (payErr) {
+          console.warn('Could not fetch item payments:', payErr.message);
         }
       }
     } catch (err) {
@@ -469,6 +484,59 @@ export const ItemDetailsPage = ({ itemId, onBack, onOpenAuth }) => {
             </div>
           )}
 
+          {/* Razorpay Test Mode Payment Gateway Card */}
+          <div className="bg-gradient-to-br from-white to-blue-50/50 rounded-3xl p-6 border border-blue-200/80 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Heart className="w-5 h-5 text-rose-500 fill-rose-500/20" />
+                <h3 className="text-sm font-bold text-slate-900">
+                  Finder Reward & Desk Fee
+                </h3>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                ⚡ Razorpay Test Mode
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Show gratitude to the student who found and safely reported this item, or cover campus desk storage & security processing.
+            </p>
+
+            {itemPayments && itemPayments.length > 0 && (
+              <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-1.5 text-xs">
+                <div className="flex items-center gap-1.5 font-bold text-emerald-800">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Rewards Recorded ({itemPayments.length})</span>
+                </div>
+                {itemPayments.map((p) => (
+                  <div key={p._id} className="text-[11px] text-emerald-700 flex justify-between">
+                    <span>{p.payer?.name || 'A student'} tipped finder:</span>
+                    <strong className="font-mono text-emerald-900">₹{p.amount} INR</strong>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {user ? (
+              <button
+                onClick={() => setShowPaymentModal(true)}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 active:scale-95 transition"
+                id="open-payment-gateway-btn"
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Pay Finder Reward via Razorpay</span>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenAuth}
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm flex items-center justify-center gap-2 transition"
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Sign in to Pay Finder Reward</span>
+              </button>
+            )}
+          </div>
+
           {/* Verification Clues (Visible questions) */}
           {item.verificationClues && item.verificationClues.length > 0 && (
             <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-3">
@@ -633,6 +701,16 @@ export const ItemDetailsPage = ({ itemId, onBack, onOpenAuth }) => {
         itemId={item._id}
         itemTitle={item.title}
         onHandoverSuccess={() => fetchItemDetails()}
+      />
+
+      {/* Payment Gateway Modal (Razorpay Test Mode) */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        item={item}
+        claim={userClaim}
+        defaultPurpose="finder_reward"
+        onPaymentSuccess={() => fetchItemDetails()}
       />
     </div>
   );

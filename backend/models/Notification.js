@@ -17,7 +17,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['claim_received', 'claim_approved', 'claim_rejected', 'handover_ready', 'item_returned'],
+      enum: ['claim_received', 'claim_approved', 'claim_rejected', 'handover_ready', 'item_returned', 'reward_received', 'payment_received'],
       default: 'claim_received'
     },
     link: {

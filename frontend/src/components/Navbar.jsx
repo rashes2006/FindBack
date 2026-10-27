@@ -244,7 +244,7 @@ export const Navbar = ({ currentView, setView, onOpenReport, onOpenAuth }) => {
                             key={notif._id}
                             onClick={() => {
                               markNotificationRead(notif._id);
-                              if (notif.link === '/my-claims') {
+                              if (notif.link === '/my-claims' || notif.type === 'reward_received' || notif.type === 'payment_received') {
                                 setView('my-dashboard');
                               }
                               setShowNotifications(false);

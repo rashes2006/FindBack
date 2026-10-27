@@ -13,12 +13,13 @@ const auditLogSchema = new mongoose.Schema(
         'HANDOVER_OTP_GENERATED',
         'HANDOVER_OTP_VERIFIED',
         'ITEM_RETURNED',
-        'CLAIM_REJECTED'
+        'CLAIM_REJECTED',
+        'PAYMENT_COMPLETED'
       ]
     },
     entityType: {
       type: String,
-      enum: ['Item', 'Claim', 'User'],
+      enum: ['Item', 'Claim', 'User', 'Payment'],
       required: true
     },
     entityId: {

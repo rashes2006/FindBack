@@ -84,6 +84,14 @@ Every university campus loses thousands of high-value items (smartphones, EarPod
    - Category recovery distribution.
    - Real-time audit trail of all security actions.
 
+6. **Workflow 6: Razorpay Payment Gateway (Test Mode)**
+   - **Finder Gratitude Rewards & Tips:** Item claimants or campus students can show monetary appreciation to the honest finder who reported an item.
+   - **Desk Storage & Security Locker Fees:** Nominal campus desk handling and storage locker payments.
+   - **Razorpay Test Mode Integration:** Built using the official Razorpay SDK (`razorpay`) and standard Razorpay Checkout window operating strictly in **Test Mode** (`rzp_test_...`).
+   - **Cryptographic Signature Verification:** Backend validates HMAC SHA256 signatures (`order_id|payment_id`) before capturing payments and writing to the permanent transaction ledger.
+   - **Interactive Payments Ledger:** Users can track total rewards sent and received on their dashboard along with Razorpay Order IDs, Payment IDs, and downloadable receipts.
+   - **Automatic Audit Trail & Notifications:** Instant notification dispatched to the finder upon reward capture and immutable audit log entry created.
+
 ---
 
 ## 🛠️ Tech Stack & Architecture
@@ -92,11 +100,13 @@ Every university campus loses thousands of high-value items (smartphones, EarPod
 - **Framework:** React 18 + Vite (fast HMR, optimized production build)
 - **Styling:** Tailwind CSS + Glassmorphism utilities + Google Fonts (*Outfit* & *Inter*)
 - **Icons & Visuals:** Lucide React, Canvas Confetti
+- **Payments:** Razorpay Standard Checkout SDK (Test Mode)
 - **State Management:** React Context API (`AuthContext`)
 
 ### Backend
 - **Runtime:** Node.js (v20+)
 - **Framework:** Express.js REST API
+- **Payments:** Razorpay Node.js SDK (`razorpay`) with HMAC SHA256 Signature Verification (Test Mode)
 - **Authentication:** JWT (JSON Web Tokens) with role-based authorization (`student`, `staff`, `admin`)
 - **Database:** MongoDB via Mongoose ODM
 - **Zero-Config Fallback:** Auto-detects if `MONGODB_URI` is provided; if not, automatically boots an embedded in-memory MongoDB instance via `mongodb-memory-server` so evaluators can run the app with zero external database configuration!

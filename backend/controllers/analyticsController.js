@@ -1,6 +1,7 @@
 const Item = require('../models/Item');
 const Claim = require('../models/Claim');
 const AuditLog = require('../models/AuditLog');
+const Payment = require('../models/Payment');
 
 // @desc    Get campus lost & found analytics and activity feed
 // @route   GET /api/analytics/dashboard
@@ -12,6 +13,14 @@ exports.getDashboardStats = async (req, res, next) => {
     const totalReturned = await Item.countDocuments({ status: 'returned' });
     const totalPendingClaims = await Claim.countDocuments({ status: 'pending' });
     const totalApprovedClaims = await Claim.countDocuments({ status: 'approved' });
+
+    // Payment stats (Razorpay Test Mode)
+    const paymentSummary = await Payment.aggregate([
+      { $match: { status: 'captured' } },
+      { $group: { _id: null, totalAmount: { $sum: '$amount' }, count: { $sum: 1 } } }
+    ]);
+    const totalRewardsPaid = paymentSummary[0] ? paymentSummary[0].totalAmount : 0;
+    const totalTransactions = paymentSummary[0] ? paymentSummary[0].count : 0;
 
     // Recovery rate percentage
     const recoveryRate =
@@ -74,7 +83,9 @@ exports.getDashboardStats = async (req, res, next) => {
         totalReturned,
         totalPendingClaims,
         totalApprovedClaims,
-        recoveryRate
+        recoveryRate,
+        totalRewardsPaid,
+        totalTransactions
       },
       categoryStats,
       zoneHotspots,

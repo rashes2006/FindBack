@@ -6,6 +6,7 @@ const Item = require('./models/Item');
 const Claim = require('./models/Claim');
 const AuditLog = require('./models/AuditLog');
 const Notification = require('./models/Notification');
+const Payment = require('./models/Payment');
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ const seedData = async () => {
     await Claim.deleteMany({});
     await AuditLog.deleteMany({});
     await Notification.deleteMany({});
+    await Payment.deleteMany({});
 
     console.log('Creating demo users...');
     const finder = await User.create({
@@ -266,6 +268,40 @@ const seedData = async () => {
       }
     ]);
 
+    console.log('Seeding Razorpay test mode payment transactions...');
+    const samplePayment = await Payment.create({
+      orderId: 'order_test_campus_seed_001',
+      paymentId: 'pay_test_rzp_airpods_reward',
+      signature: 'test_sig_campus_seed_airpods',
+      amount: 150,
+      amountInPaise: 15000,
+      currency: 'INR',
+      status: 'captured',
+      purpose: 'finder_reward',
+      item: airpods._id,
+      claim: airpodsClaim._id,
+      payer: student._id,
+      recipient: finder._id,
+      notes: 'Thank you so much Aarav for finding and reporting my AirPods!',
+      receipt: 'rcpt_seed_001',
+      mode: 'test',
+      paymentMethod: 'razorpay_test_mode'
+    });
+
+    await AuditLog.create({
+      action: 'PAYMENT_COMPLETED',
+      entityType: 'Payment',
+      entityId: samplePayment._id,
+      performedBy: student._id,
+      details: 'Paid ₹150 finder reward to Aarav Sharma via Razorpay Test Mode [ID: pay_test_rzp_airpods_reward]',
+      metadata: {
+        orderId: samplePayment.orderId,
+        paymentId: samplePayment.paymentId,
+        amount: 150,
+        mode: 'test'
+      }
+    });
+
     console.log('Creating demo notifications...');
     await Notification.create([
       {
@@ -282,6 +318,14 @@ const seedData = async () => {
         message: 'Priya Patel submitted a claim with answers for Casio fx-991EX Calculator.',
         type: 'claim_received',
         link: `/items/${calc._id}`,
+        isRead: false
+      },
+      {
+        recipient: finder._id,
+        title: '🎉 Finder Gratitude Reward Received!',
+        message: 'Priya Patel sent you a ₹150 reward for finding "Apple AirPods Pro" via Razorpay (Test Mode).',
+        type: 'reward_received',
+        link: `/items/${airpods._id}`,
         isRead: false
       }
     ]);

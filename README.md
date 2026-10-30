@@ -184,8 +184,5 @@ JWT_SECRET=findback_campus_jwt_secret_dev_key_2026
 
 ---
 
-## 🎥 Demo Video Guide (3–5 minutes)
-1. **Introduction (30s):** Explain campus lost-and-found problem and how anti-fraud verification stops false claims.
-2. **Workflow 1 (1m):** Report a found item, setting a secret verification question.
-3. **Workflow 2 (1m):** Switch to student persona, search catalog, and file a claim answering the secret clues.
-4. **Workflow 3 & 4 (1.5m):** Switch to Finder to approve claim $\rightarrow$ student receives 6-digit OTP $\rightarrow$ Security Officer enters OTP in Handover Desk terminal $\rightarrow$ Status turns to `Returned` with audit log entry.
+## 🎥 Demo Video
+https://drive.google.com/file/d/13QC7xZZR02046KNHVGD8zM95IaAGk7Sg/view?t=12.76
